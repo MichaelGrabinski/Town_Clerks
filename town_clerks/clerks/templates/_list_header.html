@@ -1,0 +1,10 @@
+{# Reusable page header for list screens - expects title/subtitle and optional buttons. #}
+<div class="page-header">
+  <div>
+    <h2 class="page-title">{{ title }}</h2>
+    {% if subtitle %}<div class="page-subtitle">{{ subtitle }}</div>{% endif %}
+  </div>
+  <div class="d-flex gap-2">
+    {% block header_buttons %}{% endblock %}
+  </div>
+</div>

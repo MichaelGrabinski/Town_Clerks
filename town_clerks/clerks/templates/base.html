@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Town Clerk Hub</title>
+    <!-- Simple CSS for layout -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --tc-bg: #f6f8fb;
+            --tc-card: #ffffff;
+            --tc-border: rgba(0,0,0,.075);
+            --tc-text: #111827;
+            --tc-muted: #6b7280;
+            --tc-primary: #0d6efd;
+        }
+
+        body {
+            font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+            background: var(--tc-bg);
+            color: var(--tc-text);
+            padding-top: 18px;
+        }
+
+        .container { max-width: 1200px; }
+
+        .navbar {
+            border: 1px solid var(--tc-border);
+            border-radius: 14px;
+            background: var(--tc-card) !important;
+            box-shadow: 0 10px 25px rgba(17,24,39,0.06);
+        }
+        .navbar-brand { font-weight: 700; letter-spacing: .2px; }
+        .navbar-nav .nav-link { color: #374151; font-weight: 600; }
+        .navbar-nav .nav-link:hover { color: #111827; }
+
+        .card {
+            border: 1px solid var(--tc-border);
+            border-radius: 16px;
+            background: var(--tc-card);
+            box-shadow: 0 10px 25px rgba(17,24,39,0.06);
+        }
+
+        .table {
+            background: var(--tc-card);
+            border-radius: 14px;
+            overflow: hidden;
+        }
+        .table thead th {
+            background: #f9fafb;
+            border-bottom: 1px solid var(--tc-border);
+            color: #374151;
+            font-weight: 700;
+        }
+
+        .btn {
+            border-radius: 12px;
+            font-weight: 600;
+        }
+        .btn-primary { box-shadow: 0 8px 16px rgba(13,110,253,.20); }
+
+        .pagination { margin-top: 18px; justify-content: center; }
+
+    /* Shared page header */
+    .page-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        margin-bottom: 14px;
+    }
+    .page-title { margin: 0; }
+    .page-subtitle { color: var(--tc-muted); }
+
+    /* Cleaner tables */
+    .table-wrap { border: 1px solid var(--tc-border); border-radius: 16px; overflow: hidden; background: var(--tc-card); }
+    .table thead th { position: sticky; top: 0; z-index: 2; }
+    .table tbody tr { transition: background-color .12s ease-in-out; }
+    .table tbody tr:hover { background-color: rgba(13,110,253,.06); }
+    .table-clickable tbody tr { cursor: pointer; }
+    .table-clickable tbody tr a { color: inherit; text-decoration: none; }
+
+    /* Forms */
+    .filter-bar { background: var(--tc-card); border: 1px solid var(--tc-border); border-radius: 16px; padding: 12px; }
+
+        /* Print-friendly defaults */
+        @media print {
+            body { padding-top: 0 !important; }
+            nav.navbar, .btn, .pagination, form { display: none !important; }
+            .container { max-width: 100% !important; }
+            .card { border: none !important; }
+            .table { font-size: 11pt; }
+            a[href]:after { content: " (" attr(href) ")"; font-size: 9pt; color: #555; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <nav class="navbar navbar-expand-lg navbar-light mb-4 px-2">
+            <div class="container-fluid">
+                <a class="navbar-brand" href="{% url 'hub' %}">🏛️ Town Clerk Hub</a>
+                <div class="navbar-nav">
+                    <a class="nav-link" href="{% url 'hub' %}">Home</a>
+                    <a class="nav-link" href="{% url 'clerks:transmitel_list' %}">Financials</a>
+                    <a class="nav-link" href="{% url 'clerks:vet_list' %}">Vets</a>
+                    <a class="nav-link" href="{% url 'clerks:marriage_list' %}">Marriages</a>
+                    <a class="nav-link" href="{% url 'clerks:vitals_list' %}">Vitals</a>
+                    <a class="nav-link" href="{% url 'clerks:ingest' %}">Ingest</a>
+                    <a class="nav-link" href="{% url 'clerks:activity_list' %}">Activity</a>
+                </div>
+            </div>
+        </nav>
+
+        {% block content %}{% endblock %}
+    </div>
+</body>
+</html>

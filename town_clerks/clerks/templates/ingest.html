@@ -1,0 +1,11 @@
+<!doctype html>
+<html>
+<head><title>Ingest</title></head>
+<body>
+<h1>Upload CSV / Excel</h1>
+<form method="post" enctype="multipart/form-data">{% csrf_token %}
+  <input type="file" name="file" accept=".csv,.xls,.xlsx" />
+  <button type="submit">Upload</button>
+</form>
+</body>
+</html>

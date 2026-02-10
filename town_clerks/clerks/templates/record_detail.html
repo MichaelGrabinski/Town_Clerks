@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% load clerks_extras %}
+
+{% block content %}
+<div class="d-none d-print-block mb-2">
+  <h2 class="mb-0">{{ title }}</h2>
+  <div class="text-muted">Printed {{ now|date:"Y-m-d H:i" }}</div>
+</div>
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <div>
+    <h2 class="mb-0">{{ title }}</h2>
+    <div class="text-muted">Record detail (read-only)</div>
+  </div>
+  <div class="d-flex gap-2">
+    {% if back_url %}
+      <a class="btn btn-outline-secondary" href="{{ back_url }}">Back</a>
+    {% endif %}
+    <a class="btn btn-outline-secondary" href="{% url 'hub' %}">Home</a>
+    <button class="btn btn-primary" type="button" onclick="window.print()">Print</button>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-body">
+    <div class="table-responsive">
+      <table class="table table-sm mb-0">
+        <tbody>
+          {% for c in columns %}
+            <tr>
+              <th style="width: 240px">{{ c.label }}</th>
+              <td class="text-break">{{ row|dict_get:c.key }}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}

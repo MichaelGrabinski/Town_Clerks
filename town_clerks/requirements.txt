@@ -1,0 +1,7 @@
+Django>=4.2
+python-dotenv
+mssql-django
+django-auth-adfs
+pandas
+pyodbc
+openpyxl

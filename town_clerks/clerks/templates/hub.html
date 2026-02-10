@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="card mb-4">
+    <div class="card-body py-4">
+        <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3">
+            <div>
+                <h1 class="h3 mb-1">Town Clerk Data Hub</h1>
+                <div class="text-muted">Pick a module to view records. Use “All Columns” for the full table view.</div>
+            </div>
+            <div class="d-flex gap-2">
+                <a class="btn btn-outline-secondary" href="{% url 'clerks:activity_list' %}">Activity Log</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-3">
+    {% for opt in options %}
+    <div class="col-md-4">
+        <div class="card h-100">
+            <div class="card-body">
+                <div class="d-flex align-items-start justify-content-between">
+                    <div>
+                        <div class="text-muted" style="font-weight: 700">Module</div>
+                        <div class="h5 mb-2">{{ opt.name }}</div>
+                    </div>
+                    <div style="font-size: 2rem; line-height: 1">{{ opt.icon }}</div>
+                </div>
+                <div class="d-flex gap-2 mt-3">
+                    <a class="btn btn-primary" href="{% url opt.url %}">Open</a>
+                    {% if opt.raw_url %}
+                        <a class="btn btn-outline-secondary" href="{% url opt.raw_url %}">All Columns</a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}
