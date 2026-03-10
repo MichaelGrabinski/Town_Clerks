@@ -84,6 +84,7 @@ class Allmarriages(models.Model):
     class Meta:
         managed = False
         db_table = 'AllMarriages'
+    app_label = 'clerks_legacy'
 
 class Marriagesfrombooks(models.Model):
     bookmar_id = models.IntegerField(db_column='BookMar_ID', primary_key=True)
@@ -96,6 +97,7 @@ class Marriagesfrombooks(models.Model):
     class Meta:
         managed = False
         db_table = 'MarriagesfromBooks'
+    app_label = 'clerks_legacy'
 
 class Marriagelicense(models.Model):
     marriage_id = models.CharField(db_column='Marriage_ID', primary_key=True, max_length=255)
@@ -112,6 +114,7 @@ class Marriagelicense(models.Model):
     class Meta:
         managed = False
         db_table = '[stg].[MarriageLicense]'
+    app_label = 'clerks_legacy'
 
 class Civilunion(models.Model):
     union_id = models.IntegerField(db_column='Union_ID', primary_key=True)
@@ -124,6 +127,7 @@ class Civilunion(models.Model):
     class Meta:
         managed = False
         db_table = 'CivilUnion'
+    app_label = 'clerks_legacy'
 
 
 # --- Legacy Models from 'Vets' DB ---
@@ -164,6 +168,7 @@ class Vet(models.Model):
     class Meta:
         managed = False
         db_table = '[stg].[vet]'
+    app_label = 'clerks_legacy'
 
 
 class Refbranch(models.Model):
@@ -173,6 +178,7 @@ class Refbranch(models.Model):
     class Meta:
         managed = False
         db_table = '[stg].[refBranch]'
+    app_label = 'clerks_legacy'
 
 # --- Legacy Models from 'Clerk_Transmittal' DB ---
 
@@ -188,6 +194,7 @@ class Transactions(models.Model):
     class Meta:
         managed = False
         db_table = '[stg].[Transactions]'
+    app_label = 'clerks_legacy'
 
 class Accounts(models.Model):
     accountid = models.IntegerField(db_column='AccountID', primary_key=True)
@@ -197,6 +204,7 @@ class Accounts(models.Model):
     class Meta:
         managed = False
         db_table = '[stg].[Accounts]'
+    app_label = 'clerks_legacy'
 
 # --- Legacy Models from 'Vitals' DB ---
 
@@ -218,3 +226,4 @@ class Deaths(models.Model):
     class Meta:
         managed = False
         db_table = '[stg].[Deaths]'
+    app_label = 'clerks_legacy'

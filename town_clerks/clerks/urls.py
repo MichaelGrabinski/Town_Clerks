@@ -24,4 +24,8 @@ urlpatterns = [
     path('transmitel/<str:pk>/', views.transmitel_tx_detail, name='transmitel_tx_detail'),
 
     path('transmitel_report/<int:pk>/', views.transmitel_detail, name='transmitel_detail'),
+
+    # Clerk keyed transmittal report (app-managed)
+    path('transmittal/new/', views.transmittal_entry, name='transmittal_entry'),
+    path('transmittal/print/<int:pk>/', views.transmittal_print, name='transmittal_print'),
 ]

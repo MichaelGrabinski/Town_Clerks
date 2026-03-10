@@ -8,6 +8,7 @@ from .models import VetRecord, TransmitelReport, Vet, Marriagelicense, Transacti
 import pandas as pd
 import json
 from django.utils import timezone
+from .forms import TransmittalEntryForm
 
 
 def _model_field_names(model_cls):
@@ -380,4 +381,59 @@ def activity_list(request):
         'q': q,
         'event_type': event_type,
         'event_types': event_types,
+    })
+
+
+def transmittal_entry(request):
+    """Clerk keyed entry for a transmittal report (printable)."""
+
+    if request.method == 'POST':
+        form = TransmittalEntryForm(request.POST)
+        if form.is_valid():
+            data = form.cleaned_data
+            items = []
+            total = 0
+            for i in range(1, 13):
+                desc = (data.get(f"item_{i}_description") or '').strip()
+                amt = data.get(f"item_{i}_amount")
+                if not desc and amt in (None, ''):
+                    continue
+                amt_val = float(amt) if amt is not None else 0.0
+                total += amt_val
+                items.append({'description': desc, 'amount': amt})
+
+            payload = {
+                'report_date': data['report_date'].isoformat(),
+                'prepared_by': data['prepared_by'],
+                'notes': data.get('notes', ''),
+                'items': items,
+                'total': total,
+            }
+
+            report = TransmitelReport.objects.create(
+                filename=f"Clerk Transmittal {payload['report_date']}",
+                data=payload,
+            )
+            return redirect('clerks:transmittal_print', pk=report.id)
+    else:
+        form = TransmittalEntryForm(initial={'report_date': timezone.localdate()})
+
+    return render(request, 'transmittal_entry.html', {
+        'form': form,
+    })
+
+
+def transmittal_print(request, pk):
+    """Print-friendly view of a keyed transmittal report."""
+
+    try:
+        report = TransmitelReport.objects.get(pk=pk)
+    except TransmitelReport.DoesNotExist:
+        return HttpResponseBadRequest('Not found')
+
+    payload = report.data or {}
+    return render(request, 'transmittal_print.html', {
+        'report': report,
+        'payload': payload,
+        'now': timezone.now(),
     })

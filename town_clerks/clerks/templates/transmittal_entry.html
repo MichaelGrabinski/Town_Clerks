@@ -1,0 +1,110 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="page-header">
+  <div>
+    <h2 class="page-title">New Clerk Transmittal Report</h2>
+    <div class="page-subtitle">Enter the report, then click “Create & Print”.</div>
+  </div>
+  <div class="d-flex gap-2">
+    <a class="btn btn-outline-secondary" href="{% url 'clerks:transmitel_list' %}">Back to Financials</a>
+    <a class="btn btn-outline-secondary" href="{% url 'hub' %}">Home</a>
+  </div>
+</div>
+
+<form method="post" class="card">
+  <div class="card-body">
+    {% csrf_token %}
+
+    <div class="row g-3">
+      <div class="col-md-3">
+        <label class="form-label">{{ form.report_date.label }}</label>
+        {{ form.report_date }}
+      </div>
+      <div class="col-md-4">
+        <label class="form-label">{{ form.prepared_by.label }}</label>
+        {{ form.prepared_by }}
+      </div>
+      <div class="col-12">
+        <label class="form-label">{{ form.notes.label }}</label>
+        {{ form.notes }}
+      </div>
+    </div>
+
+    <hr class="my-4" />
+
+    <h5 class="mb-2">Line Items</h5>
+    <div class="text-muted mb-3">Fill in only the rows you need.</div>
+
+    <div class="table-wrap">
+      <table class="table table-sm mb-0">
+        <thead>
+          <tr>
+            <th style="width: 70%">Description</th>
+            <th style="width: 30%">Amount</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for i in "123456789101112"|make_list %}{% endfor %}
+          {% for i in "1,2,3,4,5,6,7,8,9,10,11,12"|cut:" "|cut:"\n"|cut:"\r"|split:"," %}{% endfor %}
+          {# Django doesn't have a clean range tag built-in; render manually. #}
+          <tr>
+            <td>{{ form.item_1_description }}</td>
+            <td>{{ form.item_1_amount }}</td>
+          </tr>
+          <tr>
+            <td>{{ form.item_2_description }}</td>
+            <td>{{ form.item_2_amount }}</td>
+          </tr>
+          <tr>
+            <td>{{ form.item_3_description }}</td>
+            <td>{{ form.item_3_amount }}</td>
+          </tr>
+          <tr>
+            <td>{{ form.item_4_description }}</td>
+            <td>{{ form.item_4_amount }}</td>
+          </tr>
+          <tr>
+            <td>{{ form.item_5_description }}</td>
+            <td>{{ form.item_5_amount }}</td>
+          </tr>
+          <tr>
+            <td>{{ form.item_6_description }}</td>
+            <td>{{ form.item_6_amount }}</td>
+          </tr>
+          <tr>
+            <td>{{ form.item_7_description }}</td>
+            <td>{{ form.item_7_amount }}</td>
+          </tr>
+          <tr>
+            <td>{{ form.item_8_description }}</td>
+            <td>{{ form.item_8_amount }}</td>
+          </tr>
+          <tr>
+            <td>{{ form.item_9_description }}</td>
+            <td>{{ form.item_9_amount }}</td>
+          </tr>
+          <tr>
+            <td>{{ form.item_10_description }}</td>
+            <td>{{ form.item_10_amount }}</td>
+          </tr>
+          <tr>
+            <td>{{ form.item_11_description }}</td>
+            <td>{{ form.item_11_amount }}</td>
+          </tr>
+          <tr>
+            <td>{{ form.item_12_description }}</td>
+            <td>{{ form.item_12_amount }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="d-flex gap-2 mt-3">
+      <button class="btn btn-primary" type="submit">Create & Print</button>
+      <a class="btn btn-outline-secondary" href="{% url 'clerks:transmittal_entry' %}">Clear</a>
+    </div>
+  </div>
+</form>
+
+{% endblock %}

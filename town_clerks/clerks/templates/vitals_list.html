@@ -29,8 +29,7 @@
         <tr>
             <th>Date of Death</th>
             <th>Name</th>
-            <th>Date of Birth</th>
-            <th>City/State</th>
+            <th>Town</th>
         </tr>
     </thead>
     <tbody>
@@ -41,11 +40,10 @@
                 {{ d.date_of_death }}
             </td>
             <td>{{ d.last_name }}, {{ d.first_name }}</td>
-            <td>{{ d.date_of_birth }}</td>
-            <td>{{ d.city }}, {{ d.state }}</td>
+            <td>{{ d.town }}</td>
         </tr>
         {% empty %}
-        <tr><td colspan="4">No vital records found.</td></tr>
+    <tr><td colspan="3">No vital records found.</td></tr>
         {% endfor %}
     </tbody>
 </table>

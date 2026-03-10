@@ -125,9 +125,10 @@ AUTHENTICATION_BACKENDS = [
 
 DATABASE_ROUTERS = ['town_clerks.db_routers.ClerkRouter']
 
-# Disable migrations for unmanaged 'permits' app
+# Prevent migrations from ever trying to manage the legacy SQL Server tables.
+# (We only want migrations for app-owned tables like ActivityLog / TransmitelReport.)
 MIGRATION_MODULES = {
-    # Legacy tables use managed=False; keep migrations enabled so we can add app-owned tables like ActivityLog.
+    'clerks_legacy': None,
 }
 
 LOGIN_URL = 'django_auth_adfs:login'
