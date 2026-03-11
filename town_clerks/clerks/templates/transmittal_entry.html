@@ -1,0 +1,110 @@
+﻿{% extends "base.html" %}
+{% block content %}
+<div class="page-header">
+    <div>
+        <h2 class="page-title">New Transmittal Report</h2>
+        <div class="page-subtitle">Town of East Hartford - Town Clerk's Office</div>
+    </div>
+    <div class="d-flex gap-2">
+        <a class="btn btn-outline-secondary" href="{% url 'clerks:transmitel_list' %}">Back to Financials</a>
+        <a class="btn btn-outline-secondary" href="{% url 'clerks:hub' %}">Home</a>
+    </div>
+</div>
+
+<form method="post" id="transmittalForm">
+    {% csrf_token %}
+    <div class="card mb-4">
+        <div class="card-body">
+            <div class="row g-3">
+                <div class="col-md-4">
+                    <label class="form-label fw-bold">Report Date</label>
+                    <input type="date" name="report_date" class="form-control" value="{{ today|date:'Y-m-d' }}" required>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label fw-bold">Prepared By</label>
+                    <input type="text" name="prepared_by" class="form-control" placeholder="Clerk name" required>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label fw-bold">Notes</label>
+                    <input type="text" name="notes" class="form-control" placeholder="Optional notes">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card mb-4">
+        <div class="card-header bg-dark text-white">
+            <strong>Line Items</strong>
+            <span class="float-end text-white-50">Fill in only the rows you need</span>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-bordered mb-0" id="lineItemsTable">
+                    <thead class="table-light">
+                        <tr>
+                            <th style="width:5%">#</th>
+                            <th style="width:15%">Account</th>
+                            <th style="width:30%">Description</th>
+                            <th style="width:15%">Checks</th>
+                            <th style="width:15%">Cash</th>
+                            <th style="width:15%">Total</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for i in line_range %}
+                        <tr>
+                            <td class="text-center text-muted align-middle">{{ forloop.counter }}</td>
+                            <td><input type="text" name="account_{{ i }}" class="form-control form-control-sm" placeholder="Account"></td>
+                            <td><input type="text" name="desc_{{ i }}" class="form-control form-control-sm" placeholder="Description"></td>
+                            <td><input type="number" name="checks_{{ i }}" class="form-control form-control-sm money-input" step="0.01" placeholder="0.00"></td>
+                            <td><input type="number" name="cash_{{ i }}" class="form-control form-control-sm money-input" step="0.01" placeholder="0.00"></td>
+                            <td><input type="number" name="total_{{ i }}" class="form-control form-control-sm total-input" step="0.01" placeholder="0.00" readonly tabindex="-1" style="background:#f0f0f0"></td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                    <tfoot class="table-dark">
+                        <tr>
+                            <th colspan="3" class="text-end">GRAND TOTALS:</th>
+                            <th id="grandChecks">.00</th>
+                            <th id="grandCash">.00</th>
+                            <th id="grandTotal">.00</th>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="d-flex justify-content-between mb-5">
+        <a href="{% url 'clerks:transmitel_list' %}" class="btn btn-outline-secondary btn-lg">Cancel</a>
+        <button type="submit" class="btn btn-success btn-lg"><strong>Save and Print Report</strong></button>
+    </div>
+</form>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    var table = document.getElementById('lineItemsTable');
+    table.addEventListener('input', function(e) {
+        if (e.target.classList.contains('money-input')) {
+            var row = e.target.closest('tr');
+            var checks = parseFloat(row.querySelector('[name^="checks_"]').value) || 0;
+            var cash = parseFloat(row.querySelector('[name^="cash_"]').value) || 0;
+            row.querySelector('[name^="total_"]').value = (checks + cash).toFixed(2);
+        }
+        recalcGrandTotals();
+    });
+    function recalcGrandTotals() {
+        var gc = 0, gca = 0, gt = 0;
+        var rows = table.querySelectorAll('tbody tr');
+        for (var i = 0; i < rows.length; i++) {
+            gc  += parseFloat(rows[i].querySelector('[name^="checks_"]').value) || 0;
+            gca += parseFloat(rows[i].querySelector('[name^="cash_"]').value) || 0;
+            gt  += parseFloat(rows[i].querySelector('[name^="total_"]').value) || 0;
+        }
+        document.getElementById('grandChecks').textContent = '$' + gc.toFixed(2);
+        document.getElementById('grandCash').textContent   = '$' + gca.toFixed(2);
+        document.getElementById('grandTotal').textContent  = '$' + gt.toFixed(2);
+    }
+});
+</script>
+{% endblock %}

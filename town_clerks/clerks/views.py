@@ -294,6 +294,10 @@ def marriage_detail(request, pk):
 
 
 def vitals_detail(request, pk):
+    # Exclude DOB and address from the detail view too
+    all_fields = _model_field_names(Deaths)
+    hidden = {'date_of_birth', 'street_address'}
+    fields = [f for f in all_fields if f not in hidden]
     return _record_detail(
         request,
         title='Vitals / Death Record Detail',
@@ -301,6 +305,7 @@ def vitals_detail(request, pk):
         db_alias='vitals',
         pk=pk,
         back_url=reverse('clerks:vitals_list'),
+        fields=fields,
     )
 
 
@@ -338,13 +343,18 @@ def marriages_raw(request):
 
 
 def vitals_raw(request):
+    # Exclude DOB and address from the raw/all-columns view
+    all_fields = _model_field_names(Deaths)
+    hidden = {'date_of_birth', 'street_address'}
+    fields = [f for f in all_fields if f not in hidden]
     return _raw_list(
         request,
-        title='Vitals / Deaths (Raw)'
+        title='Vitals / Deaths (All Columns)'
         , model_cls=Deaths
         , db_alias='vitals'
         , default_order='-date_of_death'
         , back_url=reverse('clerks:vitals_list')
+        , fields=fields
     )
 
 
