@@ -70,6 +70,25 @@ class TransmitelReport(models.Model):
         managed = True
 
 
+class TransmittalReport(models.Model):
+    """Clerk-keyed transmittal report with line items stored as JSON."""
+    report_date = models.DateField()
+    prepared_by = models.CharField(max_length=150)
+    notes = models.TextField(blank=True, default='')
+    line_items = models.JSONField(default=list)          # [{account, description, checks, cash, total}, ...]
+    grand_total_checks = models.DecimalField(max_digits=12, decimal_places=2, default=0)
+    grand_total_cash = models.DecimalField(max_digits=12, decimal_places=2, default=0)
+    grand_total = models.DecimalField(max_digits=12, decimal_places=2, default=0)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        managed = True
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f"Transmittal {self.report_date} — {self.prepared_by}"
+
+
 # --- Legacy Models from 'Marriage' DB ---
 
 class Allmarriages(models.Model):

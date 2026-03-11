@@ -1,14 +1,18 @@
-from django.shortcuts import render, redirect
-from django.http import HttpResponse, HttpResponseBadRequest
+from django.shortcuts import render, redirect, get_object_or_404
+from django.http import HttpResponseBadRequest
 from django.core.paginator import Paginator
 from django.db.models import Q
 from django.db.models.fields import Field
 from django.urls import reverse
-from .models import VetRecord, TransmitelReport, Vet, Marriagelicense, Transactions, Deaths, ActivityLog
+from django.utils import timezone
+from decimal import Decimal
 import pandas as pd
 import json
-from django.utils import timezone
-from .forms import TransmittalEntryForm
+
+from .models import (
+    VetRecord, TransmitelReport, TransmittalReport,
+    Vet, Marriagelicense, Transactions, Deaths, ActivityLog,
+)
 
 
 def _model_field_names(model_cls):
@@ -125,10 +129,14 @@ def _record_detail(request, *, title, model_cls, db_alias, pk, back_url=None, fi
 def hub(request):
     # We will build links for all main sections
     options = [
-    {'name': 'Transmitel / Financials', 'url': 'clerks:transmitel_list', 'raw_url': 'clerks:transmitel_raw', 'icon': '💰'},
-    {'name': 'Veterans Data', 'url': 'clerks:vet_list', 'raw_url': 'clerks:vets_raw', 'icon': '🎖️'},
-    {'name': 'Marriage Licenses', 'url': 'clerks:marriage_list', 'raw_url': 'clerks:marriages_raw', 'icon': '💍'},
-    {'name': 'Death / Vitals', 'url': 'clerks:vitals_list', 'raw_url': 'clerks:vitals_raw', 'icon': '🕊️'},
+        {'name': 'Transmittal / Financials', 'url': 'clerks:transmitel_list',
+         'raw_url': 'clerks:transmitel_raw', 'icon': '💰'},
+        {'name': 'Veterans Data', 'url': 'clerks:vet_list',
+         'raw_url': 'clerks:vets_raw', 'icon': '🎖️'},
+        {'name': 'Marriage Licenses', 'url': 'clerks:marriage_list',
+         'raw_url': 'clerks:marriages_raw', 'icon': '💍'},
+        {'name': 'Death / Vitals', 'url': 'clerks:vitals_list',
+         'raw_url': 'clerks:vitals_raw', 'icon': '🕊️'},
         {'name': 'Ingest New Data', 'url': 'clerks:ingest', 'icon': '📥'},
     ]
     return render(request, 'hub.html', {'options': options})
@@ -385,56 +393,66 @@ def activity_list(request):
 
 
 def transmittal_entry(request):
-    """Clerk keyed entry for a transmittal report (printable)."""
+    """Clerk keys in a new transmittal report with line items."""
+    today = timezone.now().date()
 
     if request.method == 'POST':
-        form = TransmittalEntryForm(request.POST)
-        if form.is_valid():
-            data = form.cleaned_data
-            items = []
-            total = 0
-            for i in range(1, 13):
-                desc = (data.get(f"item_{i}_description") or '').strip()
-                amt = data.get(f"item_{i}_amount")
-                if not desc and amt in (None, ''):
-                    continue
-                amt_val = float(amt) if amt is not None else 0.0
-                total += amt_val
-                items.append({'description': desc, 'amount': amt})
+        report_date = request.POST.get('report_date', str(today))
+        prepared_by = request.POST.get('prepared_by', '').strip()
+        notes = request.POST.get('notes', '').strip()
 
-            payload = {
-                'report_date': data['report_date'].isoformat(),
-                'prepared_by': data['prepared_by'],
-                'notes': data.get('notes', ''),
-                'items': items,
-                'total': total,
-            }
+        lines = []
+        grand_checks = Decimal('0.00')
+        grand_cash = Decimal('0.00')
+        grand_total = Decimal('0.00')
 
-            report = TransmitelReport.objects.create(
-                filename=f"Clerk Transmittal {payload['report_date']}",
-                data=payload,
-            )
-            return redirect('clerks:transmittal_print', pk=report.id)
-    else:
-        # Use now().date() to avoid "localtime() cannot be applied to a naive datetime" edge cases.
-        form = TransmittalEntryForm(initial={'report_date': timezone.now().date()})
+        for i in range(30):
+            acct = request.POST.get(f'account_{i}', '').strip()
+            desc = request.POST.get(f'desc_{i}', '').strip()
+            chk = request.POST.get(f'checks_{i}', '').strip()
+            csh = request.POST.get(f'cash_{i}', '').strip()
+
+            if not acct and not desc and not chk and not csh:
+                continue
+
+            chk_val = Decimal(chk) if chk else Decimal('0.00')
+            csh_val = Decimal(csh) if csh else Decimal('0.00')
+            line_total = chk_val + csh_val
+
+            lines.append({
+                'account': acct,
+                'description': desc,
+                'checks': str(chk_val),
+                'cash': str(csh_val),
+                'total': str(line_total),
+            })
+
+            grand_checks += chk_val
+            grand_cash += csh_val
+            grand_total += line_total
+
+        report = TransmittalReport.objects.create(
+            report_date=report_date,
+            prepared_by=prepared_by,
+            notes=notes,
+            line_items=lines,
+            grand_total_checks=grand_checks,
+            grand_total_cash=grand_cash,
+            grand_total=grand_total,
+        )
+
+        return redirect('clerks:transmittal_print', pk=report.pk)
 
     return render(request, 'transmittal_entry.html', {
-        'form': form,
+        'today': today,
+        'line_range': range(15),
     })
 
 
 def transmittal_print(request, pk):
     """Print-friendly view of a keyed transmittal report."""
-
-    try:
-        report = TransmitelReport.objects.get(pk=pk)
-    except TransmitelReport.DoesNotExist:
-        return HttpResponseBadRequest('Not found')
-
-    payload = report.data or {}
+    report = get_object_or_404(TransmittalReport, pk=pk)
     return render(request, 'transmittal_print.html', {
         'report': report,
-        'payload': payload,
         'now': timezone.now(),
     })

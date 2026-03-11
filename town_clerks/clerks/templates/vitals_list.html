@@ -13,11 +13,11 @@
 
 <form method="get" class="filter-bar row g-2 align-items-end mb-3">
     <div class="col-sm-8 col-md-6">
-    <label class="form-label">Search</label>
-        <input type="text" name="q" value="{{ q }}" class="form-control" placeholder="Search name, date of death, or ID">
+        <label class="form-label">Search</label>
+        <input type="text" name="q" value="{{ q }}" class="form-control" placeholder="Search name, date of death, or town">
     </div>
     <div class="col-auto">
-    <label class="form-label">&nbsp;</label>
+        <label class="form-label">&nbsp;</label>
         <button type="submit" class="btn btn-primary">Search</button>
         <a class="btn btn-outline-secondary" href="?">Reset</a>
     </div>
@@ -37,17 +37,16 @@
         <tr>
             <td class="position-relative">
                 <a class="stretched-link" href="{% url 'clerks:vitals_detail' d.id %}"></a>
-                {{ d.date_of_death }}
+                {{ d.date_of_death|default:"—" }}
             </td>
-            <td>{{ d.last_name }}, {{ d.first_name }}</td>
-            <td>{{ d.town }}</td>
+            <td>{{ d.lastname|default:"" }}{% if d.lastname and d.first_name %}, {% endif %}{{ d.first_name|default:"" }}</td>
+            <td>{{ d.town|default:"—" }}</td>
         </tr>
         {% empty %}
-    <tr><td colspan="3">No vital records found.</td></tr>
+        <tr><td colspan="3" class="text-center text-muted py-4">No vital records found.</td></tr>
         {% endfor %}
     </tbody>
 </table>
-
 </div>
 
 <div class="pagination">
@@ -56,9 +55,7 @@
             <a href="?q={{ q|urlencode }}&page=1">&laquo; first</a>
             <a href="?q={{ q|urlencode }}&page={{ page.previous_page_number }}">previous</a>
         {% endif %}
-
-    <span class="current">Page {{ page.number }} of {{ page.paginator.num_pages }}.</span>
-
+        <span class="current">Page {{ page.number }} of {{ page.paginator.num_pages }}.</span>
         {% if page.has_next %}
             <a href="?q={{ q|urlencode }}&page={{ page.next_page_number }}">next</a>
             <a href="?q={{ q|urlencode }}&page={{ page.paginator.num_pages }}">last &raquo;</a>
