@@ -45,8 +45,6 @@
           </tr>
         </thead>
         <tbody>
-          {% for i in "123456789101112"|make_list %}{% endfor %}
-          {% for i in "1,2,3,4,5,6,7,8,9,10,11,12"|cut:" "|cut:"\n"|cut:"\r"|split:"," %}{% endfor %}
           {# Django doesn't have a clean range tag built-in; render manually. #}
           <tr>
             <td>{{ form.item_1_description }}</td>

@@ -416,7 +416,8 @@ def transmittal_entry(request):
             )
             return redirect('clerks:transmittal_print', pk=report.id)
     else:
-        form = TransmittalEntryForm(initial={'report_date': timezone.localdate()})
+        # Use now().date() to avoid "localtime() cannot be applied to a naive datetime" edge cases.
+        form = TransmittalEntryForm(initial={'report_date': timezone.now().date()})
 
     return render(request, 'transmittal_entry.html', {
         'form': form,
